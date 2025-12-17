@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bg-dark text-white font-sharetech;
+    background-image:
+      radial-gradient(#222 1px, transparent 1px),
+      linear-gradient(to bottom, #0a0a0a, #0a0a0a);
+    background-size: 40px 40px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-orbitron;
+  }
+}
+
+@layer components {
+  /* Efecto neón para títulos */
+  .neon {
+    text-shadow: 0 0 5px #ff2e9d, 0 0 10px #ff2e9d, 0 0 20px #ff2e9d;
+    @apply text-neon-pink;
+  }
+
+  /* Botones con efecto glow */
+  .cta-glow {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .cta-glow:hover {
+    box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+    transform: scale(1.05);
+  }
+
+  /* Botón especial dashboard */
+  .dashboard-btn {
+    background: linear-gradient(45deg, #6c63ff, #9d00ff);
+    border: 2px solid #00ffcc;
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .dashboard-btn:hover {
+    box-shadow: 0 0 15px #6c63ff, 0 0 30px #6c63ff;
+    transform: translateY(-2px);
+    border-color: #ff2e9d;
+  }
+
+  /* Inputs estilo Manabi */
+  .manabi-input {
+    @apply bg-bg-input border-2 border-neon-cyan text-white transition-all duration-300;
+  }
+
+  .manabi-input:focus {
+    @apply outline-none border-neon-pink;
+    box-shadow: 0 0 15px rgba(255, 46, 157, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .manabi-input::placeholder {
+    @apply text-gray-600;
+  }
+
+  .manabi-input.error {
+    @apply border-red-500;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  }
+
+  /* Tarjetas de juegos */
+  .card {
+    @apply min-h-[500px] bg-bg-card rounded-2xl p-6 shadow-lg transition-all duration-300;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+  }
+
+  .card-img {
+    @apply h-48 w-full object-cover rounded-lg mb-4 bg-gray-800;
+  }
+
+  /* Estrellas de rating */
+  .star {
+    @apply text-2xl cursor-pointer text-gray-500 transition-colors duration-200;
+  }
+
+  .star.active,
+  .star:hover {
+    @apply text-yellow-400;
+  }
+
+  /* Notificaciones */
+  .notification {
+    animation: slideIn 0.3s ease;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4;
+  }
+
+  .modal-content {
+    @apply bg-bg-card rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto border border-purple-primary;
+  }
+}
+
+@layer utilities {
+  .neon-glow {
+    text-shadow: 0 0 10px #ff2e9d, 0 0 20px #ff2e9d, 0 0 30px #ff2e9d;
+  }
+
+  .text-shadow-neon {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+  }
+}
+
+/* Animaciones personalizadas */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-bg-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-purple-primary rounded-lg;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neon-pink;
+}
