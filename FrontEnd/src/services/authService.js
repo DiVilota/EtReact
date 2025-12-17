@@ -1,16 +1,73 @@
 import api from './api';
 
 const authService = {
-  // Login
+  // Registro (crear usuario en BD)
+  register: async (userData) => {
+    try {
+      const response = await api.post('/usuarios', {
+        username: userData.usuario,
+        email: userData.email
+      });
+      
+      // Guardar con rol user por defecto
+      const user = {
+        id: response.data.id,
+        usuario: response.data.username,
+        nombre: userData.nombre,
+        email: response.data.email,
+        rol: 'user'
+      };
+      
+      return user;
+    } catch (error) {
+      console.error('Error en registro:', error);
+      throw new Error(error.response?.data?.message || 'Error al registrar usuario');
+    }
+  },
+  
+  // Login (verificar usuario existe en BD)
   login: async (credentials) => {
     try {
-      const response = await api.post('/usuarios/login', credentials);
-      return response.data;
+      // Intentar obtener todos los usuarios de la BD
+      const response = await api.get('/usuarios');
+      const users = response.data;
+      
+      // Buscar usuario por username
+      const user = users.find(u => u.username === credentials.usuario);
+      
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+      
+      // Verificar password (mock hasta implementar en backend)
+      if (credentials.usuario === 'admin' && credentials.password === 'admin123') {
+        return {
+          id: user.id,
+          usuario: user.username,
+          nombre: user.username,
+          email: user.email,
+          rol: 'admin'
+        };
+      }
+      
+      if (credentials.password === 'user123' || credentials.password === '123456') {
+        return {
+          id: user.id,
+          usuario: user.username,
+          nombre: user.username,
+          email: user.email,
+          rol: 'user'
+        };
+      }
+      
+      throw new Error('Contraseña incorrecta');
     } catch (error) {
-      // Usuarios mock para desarrollo
+      console.error('Error en login:', error);
+      
+      // Fallback a usuarios mock si falla la BD
       const mockUsers = [
-        { id: 1, usuario: 'admin', password: 'admin123', nombre: 'Administrador', rol: 'admin' },
-        { id: 2, usuario: 'user', password: 'user123', nombre: 'Usuario Normal', rol: 'user' }
+        { id: 1, usuario: 'admin', password: 'admin123', nombre: 'Administrador', email: 'admin@manabigames.com', rol: 'admin' },
+        { id: 2, usuario: 'user', password: 'user123', nombre: 'Usuario Normal', email: 'user@manabigames.com', rol: 'user' }
       ];
       
       const user = mockUsers.find(
@@ -26,30 +83,23 @@ const authService = {
     }
   },
   
-  // Registro
-  register: async (userData) => {
-    try {
-      const response = await api.post('/usuarios', userData);
-      return response.data;
-    } catch (error) {
-      console.error('Error en registro:', error);
-      throw error;
-    }
-  },
-  
-  // Obtener todos los usuarios (solo admin)
+  // Obtener todos los usuarios de la BD (solo admin)
   getAllUsers: async () => {
     try {
       const response = await api.get('/usuarios');
-      return response.data;
+      return response.data.map(user => ({
+        id: user.id,
+        usuario: user.username,
+        nombre: user.username,
+        email: user.email,
+        rol: user.username === 'admin' ? 'admin' : 'user',
+        activo: user.estaOnline,
+        fecha_registro: user.fechaRegistro,
+        total_resenas: user.totalResenas
+      }));
     } catch (error) {
-      // Usuarios mock
-      return [
-        { id: 1, usuario: 'admin', nombre: 'Administrador', email: 'admin@manabigames.com', rol: 'admin', activo: true },
-        { id: 2, usuario: 'user1', nombre: 'Juan Pérez', email: 'juan@email.com', rol: 'user', activo: true },
-        { id: 3, usuario: 'user2', nombre: 'María López', email: 'maria@email.com', rol: 'user', activo: true },
-        { id: 4, usuario: 'user3', nombre: 'Pedro González', email: 'pedro@email.com', rol: 'user', activo: false }
-      ];
+      console.error('Error al obtener usuarios:', error);
+      throw error;
     }
   }
 };

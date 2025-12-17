@@ -10,9 +10,4 @@ public class HomeController {
     public String home() {
         return "¡Backend de ManabiGames funcionando correctamente! 🎮";
     }
-
-    @GetMapping("/health")
-    public String health() {
-        return "OK";
-    }
 }

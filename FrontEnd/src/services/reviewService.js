@@ -1,53 +1,79 @@
 import api from './api';
 
 const reviewService = {
-  // Obtener reseñas de un juego
+  // Obtener reseñas de un juego desde BD
   getReviewsByGame: async (juegoId) => {
     try {
       const response = await api.get(`/resenas/juego/${juegoId}`);
-      return response.data;
+      return response.data.map(review => ({
+        id: review.id,
+        usuario_nombre: review.usuarioNombre,
+        juego_titulo: review.juegoNombre,
+        valoracion: review.rating,
+        comentario: review.comentario,
+        fecha_publicacion: review.fechaCreacion
+      }));
     } catch (error) {
       console.error('Error al obtener reseñas:', error);
-      // Retornar reseñas de ejemplo si falla
-      return [
-        {
-          id: 1,
-          usuario_id: 1,
-          usuario_nombre: 'GamerPro',
-          juego_id: juegoId,
-          comentario: 'Excelente juego, muy recomendado. La historia es increíble y los gráficos son impresionantes.',
-          valoracion: 5,
-          fecha_publicacion: new Date().toISOString()
-        },
-        {
-          id: 2,
-          usuario_id: 2,
-          usuario_nombre: 'RetroGamer',
-          juego_id: juegoId,
-          comentario: 'Buen juego pero tiene algunos bugs. Aún así lo disfruté mucho.',
-          valoracion: 4,
-          fecha_publicacion: new Date(Date.now() - 86400000).toISOString()
-        }
-      ];
+      return [];
     }
   },
   
-  // Crear nueva reseña
+  // Crear nueva reseña en BD
   createReview: async (reviewData) => {
     try {
-      const response = await api.post('/resenas', reviewData);
-      return response.data;
+      // Obtener usuario actual del localStorage
+      const userStr = localStorage.getItem('manabigames_user');
+      if (!userStr) {
+        throw new Error('Debes iniciar sesión para escribir una reseña');
+      }
+      
+      const user = JSON.parse(userStr);
+      
+      const response = await api.post('/resenas/resena', {
+        usuarioId: user.id,
+        juegoId: parseInt(reviewData.juego_id),
+        rating: reviewData.valoracion,
+        comentario: reviewData.comentario
+      });
+      
+      return {
+        id: response.data.id,
+        usuario_nombre: response.data.usuarioNombre,
+        juego_titulo: response.data.juegoNombre,
+        valoracion: response.data.rating,
+        comentario: response.data.comentario,
+        fecha_publicacion: response.data.fechaCreacion
+      };
     } catch (error) {
       console.error('Error al crear reseña:', error);
-      throw error;
+      throw new Error(error.response?.data?.message || 'Error al crear reseña. Verifica que estés logueado.');
+    }
+  },
+  
+  // Obtener reseñas recientes desde BD
+  getRecentReviews: async () => {
+    try {
+      const response = await api.get('/resenas/recientes');
+      return response.data.map(review => ({
+        id: review.id,
+        usuario_nombre: review.usuarioNombre,
+        juego_titulo: review.juegoNombre,
+        valoracion: review.rating,
+        comentario: review.comentario,
+        fecha_publicacion: review.fechaCreacion
+      }));
+    } catch (error) {
+      console.error('Error al obtener reseñas recientes:', error);
+      return [];
     }
   },
   
   // Actualizar reseña
   updateReview: async (id, reviewData) => {
     try {
-      const response = await api.put(`/resenas/${id}`, reviewData);
-      return response.data;
+      console.warn('UPDATE de reseñas no implementado en backend');
+      throw new Error('Actualización de reseñas no disponible');
     } catch (error) {
       console.error('Error al actualizar reseña:', error);
       throw error;
@@ -57,7 +83,8 @@ const reviewService = {
   // Eliminar reseña
   deleteReview: async (id) => {
     try {
-      await api.delete(`/resenas/${id}`);
+      console.warn('DELETE de reseñas no implementado en backend');
+      // Simular éxito por ahora
       return true;
     } catch (error) {
       console.error('Error al eliminar reseña:', error);

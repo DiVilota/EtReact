@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import api from '../services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -46,23 +47,19 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Simular envío (puedes conectar con tu backend aquí)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Guardar en localStorage como backup
-      const contacts = JSON.parse(localStorage.getItem('manabigames_contacts') || '[]');
-      contacts.push({
-        ...formData,
-        fecha: new Date().toISOString()
+      // Enviar a backend (combinar asunto con mensaje)
+      await api.post('/contacto', {
+        nombre: formData.nombre,
+        email: formData.email,
+        mensaje: `Asunto: ${formData.asunto}\n\n${formData.mensaje}`
       });
-      localStorage.setItem('manabigames_contacts', JSON.stringify(contacts));
       
       setSuccess(true);
       setFormData({ nombre: '', email: '', asunto: '', mensaje: '' });
       
       setTimeout(() => setSuccess(false), 5000);
     } catch (error) {
-      setErrors({ submit: 'Error al enviar mensaje. Intenta nuevamente.' });
+      setErrors({ submit: error.response?.data?.message || 'Error al enviar mensaje. Intenta nuevamente.' });
     } finally {
       setIsSubmitting(false);
     }

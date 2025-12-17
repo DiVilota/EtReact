@@ -1,6 +1,6 @@
 // Configuración de APIs
 export const API_CONFIG = {
-  baseURL: 'https://manabigamesfull-production.up.railway.app/api',
+  baseURL: 'https://etreact-production.up.railway.app',
   endpoints: {
     juegos: '/juegos',
     resenas: '/resenas',

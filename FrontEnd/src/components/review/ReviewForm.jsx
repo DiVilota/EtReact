@@ -3,7 +3,6 @@ import StarRating from '../common/StarRating';
 
 const ReviewForm = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    usuario_nombre: '',
     valoracion: 0,
     comentario: ''
   });
@@ -12,10 +11,6 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
   
   const validate = () => {
     const newErrors = {};
-    
-    if (!formData.usuario_nombre.trim()) {
-      newErrors.usuario_nombre = 'El nombre es requerido';
-    }
     
     if (formData.valoracion === 0) {
       newErrors.valoracion = 'Debes seleccionar una valoración';
@@ -39,7 +34,7 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
-      setFormData({ usuario_nombre: '', valoracion: 0, comentario: '' });
+      setFormData({ valoracion: 0, comentario: '' });
       setErrors({});
     } catch (error) {
       setErrors({ submit: error.message || 'Error al enviar reseña' });
@@ -50,23 +45,6 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
   
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Nombre de usuario */}
-      <div>
-        <label className="block text-neon-cyan font-bold mb-2">
-          Nombre
-        </label>
-        <input
-          type="text"
-          value={formData.usuario_nombre}
-          onChange={(e) => setFormData({ ...formData, usuario_nombre: e.target.value })}
-          className="w-full px-4 py-2 bg-bg-dark border-2 border-purple-primary rounded-lg text-white font-mono focus:border-neon-pink outline-none"
-          placeholder="Tu nombre"
-        />
-        {errors.usuario_nombre && (
-          <p className="text-red-500 text-sm mt-1">{errors.usuario_nombre}</p>
-        )}
-      </div>
-      
       {/* Valoración */}
       <div>
         <label className="block text-neon-cyan font-bold mb-2">
