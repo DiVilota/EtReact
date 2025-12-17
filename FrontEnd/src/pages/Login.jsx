@@ -6,23 +6,28 @@ import authService from '../services/authService';
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     usuario: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    
+
     try {
       const userData = await authService.login(formData);
+
+      // Login normal (AuthContext)
       login(userData);
-      
+
+      // ✅ Importante: sincronizar sesión para el sistema que usa userService/ReviewService
+      localStorage.setItem('usuarioActual', JSON.stringify(userData));
+
       if (userData.rol === 'admin') {
         navigate('/dashboard');
       } else {
@@ -34,7 +39,7 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-bg-card p-8 rounded-2xl w-full max-w-md border-2 border-purple-primary">
@@ -44,22 +49,26 @@ const Login = () => {
           </h2>
           <p className="text-neon-cyan text-lg">Iniciar Sesión</p>
         </div>
-        
+
         {/* Usuarios de prueba */}
         <div className="mb-6 p-4 bg-bg-dark border border-neon-cyan rounded-lg">
           <p className="text-sm text-neon-cyan mb-2 font-bold">👤 Usuarios de prueba:</p>
           <div className="text-xs text-gray-400 space-y-1 font-mono">
-            <p>Admin: <span className="text-white">usuario: admin</span> / <span className="text-white">password: admin123</span></p>
-            <p>User: <span className="text-white">usuario: user</span> / <span className="text-white">password: user123</span></p>
+            <p>
+              Admin: <span className="text-white">usuario: admin</span> /{' '}
+              <span className="text-white">password: admin123</span>
+            </p>
+            <p>
+              User: <span className="text-white">usuario: user</span> /{' '}
+              <span className="text-white">password: user123</span>
+            </p>
           </div>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Usuario */}
           <div>
-            <label className="block text-neon-cyan font-bold mb-2">
-              Usuario
-            </label>
+            <label className="block text-neon-cyan font-bold mb-2">Usuario</label>
             <input
               type="text"
               value={formData.usuario}
@@ -69,12 +78,10 @@ const Login = () => {
               required
             />
           </div>
-          
+
           {/* Password */}
           <div>
-            <label className="block text-neon-cyan font-bold mb-2">
-              Contraseña
-            </label>
+            <label className="block text-neon-cyan font-bold mb-2">Contraseña</label>
             <input
               type="password"
               value={formData.password}
@@ -84,14 +91,14 @@ const Login = () => {
               required
             />
           </div>
-          
+
           {/* Error */}
           {error && (
             <div className="p-4 bg-red-900/20 border-2 border-red-500 rounded-lg">
               <p className="text-red-400 text-sm">{error}</p>
             </div>
           )}
-          
+
           {/* Botón */}
           <button
             type="submit"
@@ -100,7 +107,7 @@ const Login = () => {
           >
             {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>
-          
+
           {/* Link a registro */}
           <div className="text-center">
             <p className="text-gray-400 text-sm">

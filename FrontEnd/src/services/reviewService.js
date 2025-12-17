@@ -1,4 +1,5 @@
 import api from './api';
+import { obtenerUsuarioActual } from './userService';
 
 const reviewService = {
   // Obtener reseñas de un juego desde BD
@@ -18,25 +19,39 @@ const reviewService = {
       return [];
     }
   },
-  
+
   // Crear nueva reseña en BD
   createReview: async (reviewData) => {
     try {
-      // Obtener usuario actual del localStorage
-      const userStr = localStorage.getItem('manabigames_user');
-      if (!userStr) {
+      // ✅ Usar la misma fuente de sesión que el UserContext (userService)
+      const user = obtenerUsuarioActual();
+      if (!user) {
         throw new Error('Debes iniciar sesión para escribir una reseña');
       }
-      
-      const user = JSON.parse(userStr);
-      
+
+      // ✅ IDs robustos (por si el backend devuelve id con otro nombre)
+      const usuarioId = Number(user.id ?? user.usuarioId ?? user.idUsuario);
+      const juegoId = Number(reviewData.juego_id ?? reviewData.juegoId ?? reviewData.id);
+      const rating = Number(reviewData.valoracion);
+      const comentario = reviewData.comentario;
+
+      if (!Number.isInteger(usuarioId)) {
+        throw new Error('No se pudo obtener el ID del usuario (sesión inválida).');
+      }
+      if (!Number.isInteger(juegoId)) {
+        throw new Error('No se pudo obtener el ID del juego.');
+      }
+      if (!Number.isInteger(rating)) {
+        throw new Error('Rating inválido.');
+      }
+
       const response = await api.post('/resenas/resena', {
-        usuarioId: user.id,
-        juegoId: parseInt(reviewData.juego_id),
-        rating: reviewData.valoracion,
-        comentario: reviewData.comentario
+        usuarioId,
+        juegoId,
+        rating,
+        comentario
       });
-      
+
       return {
         id: response.data.id,
         usuario_nombre: response.data.usuarioNombre,
@@ -47,10 +62,13 @@ const reviewService = {
       };
     } catch (error) {
       console.error('Error al crear reseña:', error);
-      throw new Error(error.response?.data?.message || 'Error al crear reseña. Verifica que estés logueado.');
+      throw new Error(
+        error.response?.data?.message ||
+        'Error al crear reseña. Verifica que estés logueado.'
+      );
     }
   },
-  
+
   // Obtener reseñas recientes desde BD
   getRecentReviews: async () => {
     try {
@@ -68,28 +86,15 @@ const reviewService = {
       return [];
     }
   },
-  
-  // Actualizar reseña
-  updateReview: async (id, reviewData) => {
-    try {
-      console.warn('UPDATE de reseñas no implementado en backend');
-      throw new Error('Actualización de reseñas no disponible');
-    } catch (error) {
-      console.error('Error al actualizar reseña:', error);
-      throw error;
-    }
+
+  updateReview: async () => {
+    console.warn('UPDATE de reseñas no implementado en backend');
+    throw new Error('Actualización de reseñas no disponible');
   },
-  
-  // Eliminar reseña
-  deleteReview: async (id) => {
-    try {
-      console.warn('DELETE de reseñas no implementado en backend');
-      // Simular éxito por ahora
-      return true;
-    } catch (error) {
-      console.error('Error al eliminar reseña:', error);
-      throw error;
-    }
+
+  deleteReview: async () => {
+    console.warn('DELETE de reseñas no implementado en backend');
+    return true;
   }
 };
 

@@ -43,7 +43,6 @@ api.interceptors.response.use(
           break;
         case 401:
           console.error('No autorizado - Redirigir a login');
-          // Aquí podrías redirigir al login
           break;
         case 404:
           console.error('Recurso no encontrado:', data);

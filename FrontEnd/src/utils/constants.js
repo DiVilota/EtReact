@@ -1,6 +1,6 @@
 // Configuración de APIs
 export const API_CONFIG = {
-  baseURL: 'https://etreact-production.up.railway.app',
+  baseURL: 'https://etreact-production.up.railway.app/api',
   endpoints: {
     juegos: '/juegos',
     resenas: '/resenas',
